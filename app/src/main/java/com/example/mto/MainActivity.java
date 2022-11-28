@@ -24,8 +24,8 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
 
     //Déclaration des champs
-RequestQueue requestQueue;
     TextView date,city, temperature, Description;
+    private RequestQueue requestQueue;
     ImageView imageView5;
     String maVille="Toronto";
 
@@ -33,24 +33,27 @@ RequestQueue requestQueue;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         setContentView(R.layout.activity_main);
+        requestQueue = Volley.newRequestQueue(this);
+
         date=findViewById(R.id.date);
         city=findViewById(R.id.city);
         temperature=findViewById(R.id.temperature);
         Description=findViewById(R.id.Description);
-        requestQueue= Volley.newRequestQueue(this);
         afficher();
 
     }
 public void afficher() {
     String url = "https://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=74ba4b0d6163b7741666f4e8d4d845fa&units=metric";
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
-        requestQueue.add(jsonObjectRequest);
+
         public void onResponse(JSONObject response) {
             try {
                 JSONObject main_object = response.getJSONObject("main");
                 JSONArray array = response.getJSONArray("weather");
                 Log.d("tag","resultat = "+ array.toString());
+                Log.d("tag","resultat  température= "+ main_object.toString());
                 System.out.print("salut");
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -63,5 +66,6 @@ public void afficher() {
         }
 
     });
+    requestQueue.add(jsonObjectRequest);
 }
 }
