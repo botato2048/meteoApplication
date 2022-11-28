@@ -4,6 +4,7 @@ import com.android.volley.Request.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
@@ -15,19 +16,23 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 
 public class MainActivity extends AppCompatActivity {
 
     //Déclaration des champs
-    TextView date,city, temperature, Description;
+    TextView date, city, temperature, Description;
     private RequestQueue requestQueue;
     ImageView imageView5;
-    String maVille="Toronto";
+    String maVille = "Toronto";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,35 +42,63 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         requestQueue = Volley.newRequestQueue(this);
 
-        date=findViewById(R.id.date);
-        city=findViewById(R.id.city);
-        temperature=findViewById(R.id.temperature);
-        Description=findViewById(R.id.Description);
+        date = findViewById(R.id.date);
+        city = findViewById(R.id.city);
+        temperature = findViewById(R.id.temperature);
+        Description = findViewById(R.id.Description);
         afficher();
 
+
     }
-public void afficher() {
-    String url = "https://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=74ba4b0d6163b7741666f4e8d4d845fa&units=metric";
-    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
 
-        public void onResponse(JSONObject response) {
-            try {
-                JSONObject main_object = response.getJSONObject("main");
-                JSONArray array = response.getJSONArray("weather");
-                Log.d("tag","resultat = "+ array.toString());
-                Log.d("tag","resultat  température= "+ main_object.toString());
-                System.out.print("salut");
-            } catch (JSONException e) {
-                e.printStackTrace();
+    public void afficher() {
+        String url = "https://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=74ba4b0d6163b7741666f4e8d4d845fa&units=metric";
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONObject main_object = response.getJSONObject("main");
+                    JSONArray array = response.getJSONArray("weather");
+                    Log.d("tag", "resultat = " + array);
+                    Log.d("tag", "resultat  température= " + main_object);
+                    JSONObject object = array.getJSONObject(0);
+                    int tempC = (int) Math.round(main_object.getDouble("temp"));
+                    String temp = String.valueOf(tempC);
+
+                    String d = object.getString("description");
+                    String c = response.getString("name");
+                    String i = object.getString("icon");
+
+                    city.setText(c);
+                    temperature.setText(temp);
+                    Description.setText(d);
+
+                    Calendar calendar = Calendar.getInstance();
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM, dd");
+                    String formatted_date = simpleDateFormat.format(calendar.getTime());
+
+                    date.setText(formatted_date);
+
+                    String imageurl = "http://openweathermap.org/img/w/" + i + ".png";
+
+                    imageView5 = findViewById(R.id.imageView5);
+
+                    Uri myUri = Uri.parse(imageurl);
+
+                    Picasso.with(MainActivity.this).load(myUri).resize(200, 200).into(imageView5);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-    }, new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
 
-        }
+            }
 
-    });
-    requestQueue.add(jsonObjectRequest);
-}
+        });
+       // RequesQueue queue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
+    }
 }
