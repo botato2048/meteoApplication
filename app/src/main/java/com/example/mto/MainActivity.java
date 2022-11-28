@@ -1,6 +1,6 @@
 package com.example.mto;
 
-import static com.android.volley.Request.*;
+import com.android.volley.Request.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,11 +22,12 @@ import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity {
+
     //Déclaration des champs
+RequestQueue requestQueue;
     TextView date,city, temperature, Description;
     ImageView imageView5;
     String maVille="Toronto";
-    private RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +38,14 @@ public class MainActivity extends AppCompatActivity {
         city=findViewById(R.id.city);
         temperature=findViewById(R.id.temperature);
         Description=findViewById(R.id.Description);
-        requestQueue= new Volley.requestQueue(this);
-        requestQueue.add(jsonObjectRequest);
+        requestQueue= Volley.newRequestQueue(this);
         afficher();
 
     }
 public void afficher() {
     String url = "https://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=74ba4b0d6163b7741666f4e8d4d845fa&units=metric";
-    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Method.GET, url, new Response.Listener<JSONObject>() {
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        requestQueue.add(jsonObjectRequest);
         public void onResponse(JSONObject response) {
             try {
                 JSONObject main_object = response.getJSONObject("main");
