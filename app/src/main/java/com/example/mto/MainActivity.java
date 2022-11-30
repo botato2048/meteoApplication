@@ -4,10 +4,15 @@ import com.android.volley.Request.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.SearchableInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -40,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         setContentView(R.layout.activity_main);
-        requestQueue = Volley.newRequestQueue(this);
+       requestQueue = Volley.newRequestQueue(this);
 
         date = findViewById(R.id.date);
         city = findViewById(R.id.city);
@@ -48,11 +53,33 @@ public class MainActivity extends AppCompatActivity {
         Description = findViewById(R.id.Description);
         afficher();
 
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.recherche, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView =(SearchView)menuItem.getActionView();
+        searchView.setQueryHint("ecrire le nom de la ville");
+        searchView.setOnQueryTextListener( new SearchView.OnQueryTextListener(){
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                maVille = query;
+                afficher();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
 
     }
 
     public void afficher() {
-        String url = "https://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=74ba4b0d6163b7741666f4e8d4d845fa&units=metric";
+        String url = "https://api.openweathermap.org/data/2.5/weather?q=" + maVille + "&appid=74ba4b0d6163b7741666f4e8d4d845fa&units=metric";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
 
             public void onResponse(JSONObject response) {
@@ -95,10 +122,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
+
             }
 
         });
-       // RequesQueue queue = Volley.newRequestQueue(this);
+        // RequesQueue queue = Volley.newRequestQueue(this);
         requestQueue.add(jsonObjectRequest);
     }
 }
